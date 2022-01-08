@@ -75,10 +75,13 @@ int main(int argc, const char** argv)
     bool command_line = false;
     std::string filename = "output.png";
 
-    if (argc >= 2)
-    {
+    if (argc >= 3) {
         command_line = true;
-        filename = std::string(argv[1]);
+        angle = std::stof(argv[2]); // -r by default
+        if (argc == 4) {
+            filename = std::string(argv[3]);
+        } else
+            return 0;
     }
 
     rst::rasterizer r(700, 700);
