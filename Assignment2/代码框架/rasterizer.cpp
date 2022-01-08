@@ -136,7 +136,6 @@ void rst::rasterizer::rasterize_triangle(const Triangle &t) {
     //z_interpolated *= w_reciprocal;
 
     // TODO : set the current pixel (use the set_pixel function) to the color of the triangle (use getColor function) if it should be painted.
-    std::map<int, Eigen::Vector3f> samplingList;
     for (int x = (int) boundingBox[0]; x <= (int) boundingBox[2]; x++) {
         for (int y = (int) boundingBox[1]; y <= (int) boundingBox[3]; y++) {
             //获取点(x,y)的深度
