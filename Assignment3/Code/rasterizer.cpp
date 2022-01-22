@@ -179,6 +179,12 @@ void rst::rasterizer::draw(std::vector<Triangle *> &TriangleList) {
             vec.y() /= vec.w();
             vec.z() /= vec.w();
         }
+        // BBS解答：
+        // 假设向量v的法线是n(有v.T * n = 0),v经过view*model变换后设为v’。
+        // 因为也要变换法线坐标，但不能用view*model变换，需要保证变换之后其法线经过变换后n’仍然有(v’.T * n’ = 0)，故要重新构造一个变换矩阵M，
+        // 简单推导一下就得到inv_trans了。设v’.T * n’ = (view * model * v).T * (M * n) = 0，
+        // 得到v.T * (view*model).T * M * n = 0,令(view *model).T * M为单位矩阵I，就能得到M就是代码中的inv_trans了
+        // 其他参考资料：https://learnopengl-cn.github.io/02%20Lighting/02%20Basic%20Lighting/#_6
 
         Eigen::Matrix4f inv_trans = (view * model).inverse().transpose();
         Eigen::Vector4f n[] = {
