@@ -337,7 +337,8 @@ int main(int argc, const char** argv)
     }
 
     Eigen::Vector3f eye_pos = {0,0,10};
-
+    //used when running in clion
+//    active_shader = normal_fragment_shader;
     r.set_vertex_shader(vertex_shader);
     r.set_fragment_shader(active_shader);
 
@@ -381,13 +382,13 @@ int main(int argc, const char** argv)
 
         if (key == 'a' )
         {
-            angle -= 0.1;
+            angle -= 5;
         }
         else if (key == 'd')
         {
-            angle += 0.1;
+            angle += 5;
         }
-
+        printf("frame:%d\n",++frame_count);
     }
     return 0;
 }
