@@ -104,7 +104,7 @@ Eigen::Vector3f texture_fragment_shader(const fragment_shader_payload &payload) 
     Eigen::Vector3f return_color = {0, 0, 0};
     if (payload.texture) {
         // TODO: Get the texture value at the texture coordinates of the current fragment
-        return_color = payload.texture->getColor(payload.tex_coords.x(),payload.tex_coords.y());
+        return_color = payload.texture->getColor(payload.tex_coords.x(), payload.tex_coords.y());
     }
     Eigen::Vector3f texture_color;
     texture_color << return_color.x(), return_color.y(), return_color.z();
@@ -282,19 +282,37 @@ Eigen::Vector3f bump_fragment_shader(const fragment_shader_payload &payload) {
     Eigen::Vector3f point = payload.view_pos;
     Eigen::Vector3f normal = payload.normal;
 
+    // get h_map
+
 
     float kh = 0.2, kn = 0.1;
 
     // TODO: Implement bump mapping here
-    // Let n = normal = (x, y, z)
-    // Vector t = (x*y/sqrt(x*x+z*z),sqrt(x*x+z*z),z*y/sqrt(x*x+z*z))
-    // Vector b = n cross product t
-    // Matrix TBN = [t b n]
-    // dU = kh * kn * (h(u+1/w,v)-h(u,v))
-    // dV = kh * kn * (h(u,v+1/h)-h(u,v))
-    // Vector ln = (-dU, -dV, 1)
-    // Normal n = normalize(TBN * ln)
-
+//     Let n = normal = (x, y, z)
+//     Vector t = (x*y/sqrt(x*x+z*z),sqrt(x*x+z*z),z*y/sqrt(x*x+z*z))
+//     Vector b = n cross product t
+//     Matrix TBN = [t b n]
+//     dU = kh * kn * (h(u+1/w,v)-h(u,v))
+//     dV = kh * kn * (h(u,v+1/h)-h(u,v))
+//     Vector ln = (-dU, -dV, 1)
+//     Normal n = normalize(TBN * ln)
+    Eigen::Vector3f n = normal;
+    Eigen::Vector3f t(n.x() * n.y() / std::sqrt(n.x() * n.x() + n.z() * n.z()),
+                      std::sqrt(n.x() * n.x() + n.z() * n.z()),
+                      n.z() * n.y() / std::sqrt(n.x() * n.x() + n.z() * n.z()));
+    Eigen::Vector3f b = n.cross(t);
+    //坐标系变换,推导 http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-13-normal-mapping/
+    Eigen::Matrix3f TBN;
+    TBN << t, b, n;
+    float u = payload.tex_coords[0];
+    float v = payload.tex_coords[1];
+    float w = payload.texture->width;
+    float h = payload.texture->height;
+    //贴图提供的法线信息,norm()可以看作高度,转换为以为坐标.https://blog.csdn.net/m0_56348460/article/details/117386857
+    float dU = kh * kn * (payload.texture->getColor(u + 1 / w, v).norm() - payload.texture->getColor(u, v).norm());
+    float dV = kh * kn * (payload.texture->getColor(u, v + 1 / h).norm() - payload.texture->getColor(u, v).norm());
+    Vector3f ln(-dU,-dV,1);
+    normal = (TBN * ln).normalized();
 
     Eigen::Vector3f result_color = {0, 0, 0};
     result_color = normal;
