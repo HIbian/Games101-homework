@@ -104,7 +104,7 @@ Eigen::Vector3f texture_fragment_shader(const fragment_shader_payload &payload) 
     Eigen::Vector3f return_color = {0, 0, 0};
     if (payload.texture) {
         // TODO: Get the texture value at the texture coordinates of the current fragment
-
+        return_color = payload.texture->getColor(payload.tex_coords.x(),payload.tex_coords.y());
     }
     Eigen::Vector3f texture_color;
     texture_color << return_color.x(), return_color.y(), return_color.z();
@@ -134,6 +134,26 @@ Eigen::Vector3f texture_fragment_shader(const fragment_shader_payload &payload) 
         // TODO: For each light source in the code, calculate what the *ambient*, *diffuse*, and *specular* 
         // components are. Then, accumulate that result on the *result_color* object.
 
+        //get l,n,v,r
+        Eigen::Vector3f l = light.position - point;
+        Eigen::Vector3f v = eye_pos - point;
+        Eigen::Vector3f n = normal;
+        float r_2 = std::pow(l.x(), 2) + std::pow(l.y(), 2) + std::pow(l.z(), 2);
+        l.normalize();
+        v.normalize();
+        n.normalize();
+
+        //镜面高光
+        Eigen::Vector3f h = l + v;
+        h.normalize();
+        //cwiseproduct 是将两个向量的每个项单独相乘，如k*b=（kxbx,kyby,kzbz），因为环境光，漫反射系数是分别作用于每个分量上的，
+        Eigen::Vector3f specular = ks.cwiseProduct(light.intensity / r_2) * std::pow(std::max(0.0f, n.dot(h)), p);
+        //漫反射
+        Eigen::Vector3f diffuse = kd.cwiseProduct(light.intensity / r_2) * std::max(0.0f, l.dot(n));
+        //环境光
+        Eigen::Vector3f ambient = ka.cwiseProduct(amb_light_intensity);
+
+        result_color += specular + diffuse + ambient;
     }
 
     return result_color * 255.f;
