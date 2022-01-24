@@ -316,7 +316,7 @@ int main(int argc, const char **argv) {
 
     std::function<Eigen::Vector3f(fragment_shader_payload)> active_shader = phong_fragment_shader;
 
-    if (argc >= 2) {
+    if (argc >= 3) {
         command_line = true;
         filename = std::string(argv[1]);
 
@@ -338,11 +338,29 @@ int main(int argc, const char **argv) {
             std::cout << "Rasterizing using the bump shader\n";
             active_shader = displacement_fragment_shader;
         }
+    } else if (argc == 2) {
+        //used when running in terminal
+        if (std::string(argv[1]) == "texture") {
+            std::cout << "Rasterizing using the texture shader\n";
+            active_shader = texture_fragment_shader;
+            texture_path = "spot_texture.png";
+            r.set_texture(Texture(obj_path + texture_path));
+        } else if (std::string(argv[1]) == "normal") {
+            std::cout << "Rasterizing using the normal shader\n";
+            active_shader = normal_fragment_shader;
+        } else if (std::string(argv[1]) == "phong") {
+            std::cout << "Rasterizing using the phong shader\n";
+            active_shader = phong_fragment_shader;
+        } else if (std::string(argv[1]) == "bump") {
+            std::cout << "Rasterizing using the bump shader\n";
+            active_shader = bump_fragment_shader;
+        } else if (std::string(argv[1]) == "displacement") {
+            std::cout << "Rasterizing using the bump shader\n";
+            active_shader = displacement_fragment_shader;
+        }
     }
 
     Eigen::Vector3f eye_pos = {0, 0, 10};
-    //todo used when running in clion
-    active_shader = phong_fragment_shader;
     r.set_vertex_shader(vertex_shader);
     r.set_fragment_shader(active_shader);
 

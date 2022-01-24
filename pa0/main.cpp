@@ -13,6 +13,7 @@ int main(){
     M_rotate_45_move1_2 << (float)cos45, (float)-sin45,1.0,(float)sin45,(float)cos45,2.0,0.0,0.0,1.0;
     P = M_rotate_45_move1_2 * P;
     std::cout << P << std::endl;
+    example();
     return 0;
 }
 
@@ -59,4 +60,11 @@ void example() {// Basic Example of cpp
     std::cout << i*j << std::endl;
     // matrix multiply vector i * v
     std::cout << i*v*2 << std::endl;
+
+    //my example
+    Eigen::Vector3f n(321,231,123);
+    std::cout << n << std::endl;
+    n.normalize();
+    std::cout << n << std::endl;
+    std::cout << n/2.0f<< std::endl;
 }
