@@ -252,11 +252,11 @@ Eigen::Vector3f displacement_fragment_shader(const fragment_shader_payload &payl
     //贴图提供的法线信息,norm()可以看作高度,转换为以为坐标.https://blog.csdn.net/m0_56348460/article/details/117386857
     float dU = kh * kn * (payload.texture->getColor(u + 1 / w, v).norm() - payload.texture->getColor(u, v).norm());
     float dV = kh * kn * (payload.texture->getColor(u, v + 1 / h).norm() - payload.texture->getColor(u, v).norm());
-    Vector3f ln(-dU,-dV,1);
+    Vector3f ln(-dU, -dV, 1);
     normal = (TBN * ln).normalized();
 
     // Position p = p + kn * n * h(u,v)
-    point = point + kn * n * payload.texture->getColor(u,v).norm();
+    point = point + kn * n * payload.texture->getColor(u, v).norm();
 
     Eigen::Vector3f result_color = {0, 0, 0};
     for (auto &light: lights) {
@@ -275,7 +275,8 @@ Eigen::Vector3f displacement_fragment_shader(const fragment_shader_payload &payl
         Eigen::Vector3f h_light = l_vect + v_vec;
         h_light.normalize();
         //cwiseproduct 是将两个向量的每个项单独相乘，如k*b=（kxbx,kyby,kzbz），因为环境光，漫反射系数是分别作用于每个分量上的，
-        Eigen::Vector3f specular = ks.cwiseProduct(light.intensity / r_2) * std::pow(std::max(0.0f, n_vec.dot(h_light)), p);
+        Eigen::Vector3f specular =
+                ks.cwiseProduct(light.intensity / r_2) * std::pow(std::max(0.0f, n_vec.dot(h_light)), p);
         //漫反射
         Eigen::Vector3f diffuse = kd.cwiseProduct(light.intensity / r_2) * std::max(0.0f, l_vect.dot(n_vec));
         //环境光
@@ -339,7 +340,7 @@ Eigen::Vector3f bump_fragment_shader(const fragment_shader_payload &payload) {
     //贴图提供的法线信息,norm()可以看作高度,转换为以为坐标.https://blog.csdn.net/m0_56348460/article/details/117386857
     float dU = kh * kn * (payload.texture->getColor(u + 1 / w, v).norm() - payload.texture->getColor(u, v).norm());
     float dV = kh * kn * (payload.texture->getColor(u, v + 1 / h).norm() - payload.texture->getColor(u, v).norm());
-    Vector3f ln(-dU,-dV,1);
+    Vector3f ln(-dU, -dV, 1);
     normal = (TBN * ln).normalized();
 
     Eigen::Vector3f result_color = {0, 0, 0};
@@ -356,10 +357,12 @@ int main(int argc, const char **argv) {
 
     std::string filename = "output.png";
     objl::Loader Loader;
-    std::string obj_path = "../models/spot/";
+//    std::string obj_path = "../models/spot/";
+    std::string obj_path = "../models/rock/";
 
     // Load .obj File
-    bool loadout = Loader.LoadFile("../models/spot/spot_triangulated_good.obj");
+//    bool loadout = Loader.LoadFile("../models/spot/spot_triangulated_good.obj");
+    bool loadout = Loader.LoadFile("../models/rock/rock.obj");
     for (auto mesh: Loader.LoadedMeshes) {
         for (int i = 0; i < mesh.Vertices.size(); i += 3) {
             Triangle *t = new Triangle();
@@ -377,7 +380,8 @@ int main(int argc, const char **argv) {
 
     rst::rasterizer r(700, 700);
 
-    auto texture_path = "hmap.jpg";
+//    auto texture_path = "hmap.jpg";
+    auto texture_path = "rock.png";
     r.set_texture(Texture(obj_path + texture_path));
 
     std::function<Eigen::Vector3f(fragment_shader_payload)> active_shader = phong_fragment_shader;
@@ -409,7 +413,8 @@ int main(int argc, const char **argv) {
         if (std::string(argv[1]) == "texture") {
             std::cout << "Rasterizing using the texture shader\n";
             active_shader = texture_fragment_shader;
-            texture_path = "spot_texture.png";
+//            texture_path = "spot_texture.png";
+            texture_path = "rock.png";
             r.set_texture(Texture(obj_path + texture_path));
         } else if (std::string(argv[1]) == "normal") {
             std::cout << "Rasterizing using the normal shader\n";
@@ -421,7 +426,7 @@ int main(int argc, const char **argv) {
             std::cout << "Rasterizing using the bump shader\n";
             active_shader = bump_fragment_shader;
         } else if (std::string(argv[1]) == "displacement") {
-            std::cout << "Rasterizing using the bump shader\n";
+            std::cout << "Rasterizing using the displacement shader\n";
             active_shader = displacement_fragment_shader;
         }
     }
