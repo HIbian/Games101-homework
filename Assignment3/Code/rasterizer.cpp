@@ -295,6 +295,7 @@ void rst::rasterizer::rasterize_triangle(const Triangle &t, const std::array<Eig
             depth_buf[get_index(x, y)] = zp;
 
             // 我之前下面自己做的不对，参考别人代码后发现是插值还原坐标空间视图中的坐标时，我用的光栅化后的三角形而不是空间中的三角形,更改后还是使用自己的代码,自己的代码把透视矫正也做了
+            // https://blog.csdn.net/weixin_45455414/article/details/116609056
 //            auto interpolated_color = interpolate(alpha,beta,gamma,t.color[0],t.color[1],t.color[2],1);
 //            auto interpolated_normal= interpolate(alpha,beta,gamma,t.normal[0],t.normal[1],t.normal[2],1);
 //            auto interpolated_texcoords= interpolate(alpha,beta,gamma,t.tex_coords[0],t.tex_coords[1],t.tex_coords[2],1);
