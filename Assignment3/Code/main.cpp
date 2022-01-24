@@ -169,26 +169,26 @@ Eigen::Vector3f phong_fragment_shader(const fragment_shader_payload &payload) {
         // components are. Then, accumulate that result on the *result_color* object.
 
         //get l,n,v,r
-        Vector3f l = light.position - point;
-        Vector3f v = eye_pos - point;
-        Vector3f n = normal;
-        float r_2 = pow(l.x(), 2) + pow(l.y(), 2) + pow(l.z(), 2);
+        Eigen::Vector3f l = light.position - point;
+        Eigen::Vector3f v = eye_pos - point;
+        Eigen::Vector3f n = normal;
+        float r_2 = std::pow(l.x(), 2) + std::pow(l.y(), 2) + std::pow(l.z(), 2);
         l.normalize();
         v.normalize();
         n.normalize();
 
         //镜面高光
-        Vector3f h = l + v;
+        Eigen::Vector3f h = l + v;
         h.normalize();
-        Vector3f specular = ks * (light.intensity / r_2) * pow(std::max(0.0f, n.dot(h)), p);
+        //cwiseproduct 是将两个向量的每个项单独相乘，如k*b=（kxbx,kyby,kzbz），因为环境光，漫反射系数是分别作用于每个分量上的，
+        Eigen::Vector3f specular = ks.cwiseProduct(light.intensity / r_2) * std::pow(std::max(0.0f, n.dot(h)), p);
         //漫反射
-        Vector3f diffuse = kd * (light.intensity / r_2) * std::max(0.0f, l.dot(n));
+        Eigen::Vector3f diffuse = kd.cwiseProduct(light.intensity / r_2) * std::max(0.0f, l.dot(n));
         //环境光
-        Vector3f ambient = ka * amb_light_intensity;
+        Eigen::Vector3f ambient = ka.cwiseProduct(amb_light_intensity);
 
         result_color += specular + diffuse + ambient;
     }
-
     return result_color * 255.f;
 }
 
@@ -341,8 +341,8 @@ int main(int argc, const char **argv) {
     }
 
     Eigen::Vector3f eye_pos = {0, 0, 10};
-    //used when running in clion
-//    active_shader = normal_fragment_shader;
+    //todo used when running in clion
+    active_shader = phong_fragment_shader;
     r.set_vertex_shader(vertex_shader);
     r.set_fragment_shader(active_shader);
 

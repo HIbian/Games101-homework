@@ -293,6 +293,19 @@ void rst::rasterizer::rasterize_triangle(const Triangle &t, const std::array<Eig
                 continue;
             }
             depth_buf[get_index(x, y)] = zp;
+
+            // 我之前下面自己做的不对，参考别人代码后发现是插值还原坐标空间视图中的坐标时，我用的光栅化后的三角形而不是空间中的三角形,更改后还是使用自己的代码,自己的代码把透视矫正也做了
+//            auto interpolated_color = interpolate(alpha,beta,gamma,t.color[0],t.color[1],t.color[2],1);
+//            auto interpolated_normal= interpolate(alpha,beta,gamma,t.normal[0],t.normal[1],t.normal[2],1);
+//            auto interpolated_texcoords= interpolate(alpha,beta,gamma,t.tex_coords[0],t.tex_coords[1],t.tex_coords[2],1);
+//            auto interpolated_shadingcoords= interpolate(alpha,beta,gamma,view_pos[0],view_pos[1],view_pos[2],1);
+//
+//            fragment_shader_payload payload(interpolated_color, interpolated_normal, interpolated_texcoords, texture ? &*texture : nullptr);
+//            payload.view_pos = interpolated_shadingcoords;
+//            auto pixel_color = fragment_shader(payload);
+//            frame_buf[get_index(x, y)] = pixel_color;
+
+
             //法向量
             Vector3f np =
                     t.normal[0] * alpha / v[0].w() + t.normal[1] * beta / v[1].w() + t.normal[2] * gamma / v[2].w();
@@ -306,11 +319,10 @@ void rst::rasterizer::rasterize_triangle(const Triangle &t, const std::array<Eig
                           t.tex_coords[2] * gamma / v[2].w();
             tp = tp * Z;
             //该点空间中坐标
-            float space_coords_x = t.v[0].x()* alpha / v[0].w() + t.v[1].x() * beta / v[1].w()+ t.v[2].x() * gamma / v[2].w();
-            float space_coords_y = t.v[0].y()* alpha / v[0].w() + t.v[1].y() * beta / v[1].w()+ t.v[2].y() * gamma / v[2].w();
+            float space_coords_x = view_pos[0].x()* alpha / v[0].w() + view_pos[1].x() * beta / v[1].w()+ view_pos[2].x() * gamma / v[2].w();
+            float space_coords_y = view_pos[0].y()* alpha / v[0].w() + view_pos[1].y() * beta / v[1].w()+ view_pos[2].y() * gamma / v[2].w();
             space_coords_x *= Z;
             space_coords_y *= Z;
-
 
             fragment_shader_payload payload(cp, np, tp, texture ? &*texture : nullptr);
             payload.view_pos = Vector3f(space_coords_x,space_coords_y,zp);
