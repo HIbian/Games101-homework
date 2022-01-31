@@ -3,9 +3,10 @@
 #include <opencv2/opencv.hpp>
 
 std::vector<cv::Point2f> control_points;
+const int point_size = 4;
 
 void mouse_handler(int event, int x, int y, int flags, void *userdata) {
-    if (event == cv::EVENT_LBUTTONDOWN && control_points.size() < 4) {
+    if (event == cv::EVENT_LBUTTONDOWN && control_points.size() < point_size) {
         std::cout << "Left button of the mouse is clicked - position (" << x << ", "
                   << y << ")" << '\n';
         control_points.emplace_back(x, y);
@@ -78,8 +79,8 @@ int main() {
             cv::circle(window, point, 3, {255, 255, 255}, 3);
         }
 
-        if (control_points.size() == 4) {
-            naive_bezier(control_points, window);
+        if (control_points.size() == point_size) {
+//            naive_bezier(control_points, window);
             bezier(control_points, window);
 
             cv::imshow("Bezier Curve", window);
