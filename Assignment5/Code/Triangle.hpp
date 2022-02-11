@@ -5,7 +5,7 @@
 #include <cstring>
 
 bool isInZero2One(float num) {
-    if (num >= -__FLT_EPSILON__)
+    if (num >= __FLT_EPSILON__)
         return true;
     return false;
 }

@@ -10,16 +10,27 @@
 int main() {
     Scene scene(1280, 960);
 
-    auto sph1 = std::make_unique<Sphere>(Vector3f(-1, 0, -12), 2);
-    sph1->materialType = DIFFUSE_AND_GLOSSY;
-    sph1->diffuseColor = Vector3f(0.6, 0.7, 0.8);
+    auto sph1 = std::make_unique<Sphere>(Vector3f(-1, 0, -12), 1.4);
+    sph1->materialType = REFLECTION_AND_REFRACTION;
+    sph1->ior = 1.6;
 
-    auto sph2 = std::make_unique<Sphere>(Vector3f(0.5, -0.5, -8), 1.5);
+    auto sph2 = std::make_unique<Sphere>(Vector3f(0.5, 0.5, -8), 1.5);
     sph2->ior = 1.5;
     sph2->materialType = REFLECTION_AND_REFRACTION;
 
+    auto sph3 = std::make_unique<Sphere>(Vector3f(-2.5, -0.5, -10), 1.3);
+    sph3->ior = 1.6;
+    sph3->materialType = REFLECTION_AND_REFRACTION;
+
+    auto sph4 = std::make_unique<Sphere>(Vector3f(2.5, -0.5, -14), 2.5);
+    sph4->materialType = DIFFUSE_AND_GLOSSY;
+    sph1->diffuseColor = Vector3f(0.6, 0.5, 0.5);
+
     scene.Add(std::move(sph1));
     scene.Add(std::move(sph2));
+    scene.Add(std::move(sph3));
+    scene.Add(std::move(sph4));
+
 
     Vector3f verts[4] = {{-5, -3, -6},
                          {5,  -3, -6},
